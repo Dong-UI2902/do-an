@@ -40,20 +40,13 @@
                 <div class="card">
                     <div class="card-body">
                         <center class="m-t-30">
-                            <label for="avatar-input" style="cursor: pointer; position: relative; display: inline-block;"
+                            <label for="avatar" style="cursor: pointer; position: relative; display: inline-block;"
                                 title="Bấm vào đây để đổi ảnh đại diện">
 
                                 <img src="{{ $user->avatar ? asset($user->avatar) : asset('admin/assets/images/users/5.jpg') }}"
                                     id="avatar-preview" class="rounded-circle" width="150" height="150"
                                     style="object-fit: cover; border: 2px solid #ddd;" />
-
-                                <div class="avatar-hover-icon">
-                                    <i class="fa fa-camera"></i>
-                                </div>
                             </label>
-
-                            <input type="file" id="avatar-input" name="avatar" accept="image/*" style="display: none;"
-                                onchange="previewAvatar(this)">
 
                             <h4 class="card-title m-t-10">{{ $user->name }}</h4>
                             <h6 class="card-subtitle">Accounts Manager Amix corp</h6>
@@ -96,32 +89,90 @@
             <div class="col-lg-8 col-xlg-9 col-md-7">
                 <div class="card">
                     <div class="card-body">
-                        <form class="form-horizontal form-material">
+                        <form class="form-horizontal form-material" action="/manager/profile" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+
+                            <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;"
+                                onchange="previewAvatar(this)">
+
                             <div class="form-group">
                                 <label class="col-md-12">Full Name</label>
                                 <div class="col-md-12">
-                                    <input type="text" placeholder={{ $user->name }}
-                                        class="form-control form-control-line">
+                                    <input type="text" value="{{ $user->name }}" class="form-control form-control-line"
+                                        name="name">
+                                    @error('name')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="example-email" class="col-md-12">Email</label>
                                 <div class="col-md-12">
-                                    <input type="email" placeholder={{ $user->email }}
-                                        class="form-control form-control-line" name="example-email" id="example-email">
+                                    <input type="email" value="{{ $user->email }}" class="form-control form-control-line"
+                                        name="email" id="email" readonly>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-12">Password</label>
                                 <div class="col-md-12">
-                                    <input type="password" value="" class="form-control form-control-line">
+                                    <input type="password" name="password" id="password"
+                                        class="form-control form-control-line"
+                                        placeholder="Leave blank if you do not want to change">
+                                    @error('password')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
+                            <div class="form-group" id="confirm-password" style="display: none;">
+                                <label class="col-md-12">Confirm Password</label>
+                                <div class="col-md-12">
+                                    <input type="password" name="password_confirmation" id="password_confirmation"
+                                        class="form-control form-control-line" placeholder="Re-enter your new password">
+                                </div>
+                            </div>
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    const passwordInput = document.getElementById('password');
+                                    const confirmBlock = document.getElementById('confirm-password');
+                                    const confirmInput = document.getElementById('password_confirmation');
+
+                                    passwordInput.addEventListener('input', function() {
+                                        if (this.value.trim().length > 0) {
+                                            confirmBlock.style.display = 'block';
+                                        } else {
+                                            confirmBlock.style.display = 'none';
+                                            confirmInput.value = '';
+                                        }
+                                    });
+                                });
+
+                                function previewAvatar(input) {
+                                    if (input.files && input.files[0]) {
+                                        var reader = new FileReader();
+                                        reader.onload = function(e) {
+                                            document.getElementById('avatar-preview').src = e.target.result;
+                                        }
+
+                                        reader.readAsDataURL(input.files[0]);
+                                    }
+                                }
+                            </script>
                             <div class="form-group">
                                 <label class="col-md-12">Phone No</label>
                                 <div class="col-md-12">
-                                    <input type="text" placeholder={{ $user->phone }}
+                                    <input type="text" name="phone" value={{ $user->phone }}
                                         class="form-control form-control-line">
+                                    @error('phone')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="form-group">
@@ -133,18 +184,42 @@
                             <div class="form-group">
                                 <label class="col-sm-12">Select Country</label>
                                 <div class="col-sm-12">
-                                    <select class="form-control form-control-line">
+                                    <select class="form-control form-control-line" name="country_id">
                                         @foreach ($countries as $country)
                                             <option value="{{ $country->id }}" @selected($country->id == $user->country_id)>
                                                 {{ $country->name }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    @error('country_id')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
+                            </div>
+                            <div class="col-md-12 style-alerts">
+
+                                @if (session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <strong class="me-2">Success! </strong> {{ session('success') }}
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if (session('error'))
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <strong class="me-2">Error! </strong> {{ session('error') }}
+                                        </div>
+                                    </div>
+                                @endif
+
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-12">
-                                    <button class="btn btn-success">Update Profile</button>
+                                    <button type="submit" class="btn btn-success">Update Profile</button>
                                 </div>
                             </div>
                         </form>

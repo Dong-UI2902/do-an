@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BlogController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,8 @@ Route::prefix('manager')->group(function () {
     Route::get('/country/create', [CountryController::class, 'create']);
     Route::post('/country', [CountryController::class, 'store']);
     Route::delete('/country/{id}', [CountryController::class, 'destroy']);
+
+    Route::resource('/blog', BlogController::class);
 });
 
 Auth::routes();

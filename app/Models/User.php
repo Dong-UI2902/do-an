@@ -14,6 +14,8 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     const PATH_AVATAR = 'upload/user/avatars/';
+    const ROLE_MEMBER = 0;
+    const ROLE_ADMIN = 1;
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +29,8 @@ class User extends Authenticatable
         'phone',
         'country_id',
         'avatar',
+        'role',
+        'address',
     ];
 
     /**
@@ -52,5 +56,14 @@ class User extends Authenticatable
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (is_null($user->role)) {
+                $user->role = self::ROLE_MEMBER;
+            }
+        });
     }
 }

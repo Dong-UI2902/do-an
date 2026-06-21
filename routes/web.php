@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Frontend\UserController as FrontendUserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('frontend.home');
 });
 
 Route::prefix('manager')->group(function () {
@@ -41,6 +42,16 @@ Route::prefix('manager')->group(function () {
     Route::resource('/blog', BlogController::class);
 });
 
-Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/register', [FrontendUserController::class, 'create']);
+Route::post('/register', [FrontendUserController::class, 'register']);
+
+
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', function () {
+        return view('frontend.login');
+    });
+
+    Route::post('login', [FrontendUserController::class, 'login']);
+});

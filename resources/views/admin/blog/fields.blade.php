@@ -43,7 +43,7 @@
 </div>
 
 
-@include('admin.layouts.status')
+@include('layouts.status')
 <div class="row align-items-center">
     <div class="col-md-12 text-left text-end">
         <button type="submit" class="btn btn-success text-white">
